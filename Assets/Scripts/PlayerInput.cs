@@ -3,10 +3,10 @@ using UnityEngine;
 
 public class PlayerInput : MonoBehaviour
 {
-    public string moveAxisName = "Vertical";
-    public string rotateAxisName = "Horizontal";
-    public string fireButtonName = "Fire1";
-    public string reloadButtonName = "Reload";
+    public static readonly string  moveAxisName = "Vertical";
+    public static readonly string  rotateAxisName = "Horizontal";
+    public static readonly string  fireButtonName = "Fire1";
+    public static readonly string  reloadButtonName = "Reload";
 
     public float move { get; private set; }
     public float rotate { get; private set; }   

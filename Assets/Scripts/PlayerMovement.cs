@@ -3,6 +3,9 @@ using UnityEngine.UIElements;
 
 public class PlayerMovement : MonoBehaviour
 {
+
+    public static readonly int HashMove = Animator.StringToHash("Move");  // 문자열 리터럴을 넘겨주는 대신, 해시값을 넘겨주는 방식으로 최적화
+
     public float moveSpeed = 5f;
     public float rotateSpeed = 180f;
 
@@ -21,7 +24,7 @@ public class PlayerMovement : MonoBehaviour
         Rotate();
         Move();
 
-        playerAnimator.SetFloat("Move", playerInput.move);
+        playerAnimator.SetFloat(HashMove, playerInput.move);
     }
 
     private void Move()
