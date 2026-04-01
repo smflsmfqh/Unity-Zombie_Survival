@@ -12,13 +12,14 @@ public class Gun : MonoBehaviour
     }
 
     public Stats State { get; private set; }
+    public UIManager uiManager;
 
     public Transform fireTransform; // 총알이 발사되는 위치 -> 범위로 정의해야 방향같은 걸 정의할 수 있음, 빈 게임 오브젝트활용
 
     // --- public으로 선언한 이유? - 인스펙터 창에서 할당하기 위해서, 총구 화염 효과와 탄피 배출 효과는 총마다 다를 수 있기 때문에, 각 총마다 다른 효과를 할당할 수 있도록 public으로 선언
     public ParticleSystem muzzleFlashEffect;  // 총구 화염 효과
     public ParticleSystem shellEjectEffect;  // 탄피 배출 효과  
-
+    public LayerMask targetLayer;
     private LineRenderer bulletLineRenderer;  // 총알 궤적을 그리기 위한 LineRenderer
                                               // 충돌한 지점을 끝점으로 설정하여 총알 궤적을 시각적으로 표현
 
@@ -51,6 +52,8 @@ public class Gun : MonoBehaviour
         ammoRemain = gunData.startAmmoRemain;
         magAmmo = gunData.magCapacity;
 
+        uiManager.SetAmmoText(magAmmo, ammoRemain);
+
         State = Stats.Ready;
         lastFireTime = 0f;
     }
@@ -79,13 +82,17 @@ public class Gun : MonoBehaviour
 
         Vector3 hitPosition = Vector3.zero; // Raycast의 결과로 충돌한 지점을 저장할 변수, 총알이 충돌한 지점이 없을 경우에는 총구에서 사정 거리만큼 떨어진 지점을 저장
 
-        // 총구 정보, 충돌 정보를 저장할 변수, 총알의 사정 거리
-        if (Physics.Raycast(ray, out RaycastHit hit, fireDistance))
+        // 총구 정보, 충돌 정보를 저장할 변수, 총알의 사정 거리, Raycast()의 반환형: bool
+        if (Physics.Raycast(ray, out RaycastHit hit, fireDistance, targetLayer)) // targetLayer 설정 -> Inspector에서 Everything 선택 -> NoHit(HitBox의 레이어)만 체크 제외 => HItBox가 아닌 좀비 몸의 Capsule Collider를 맞추기 위함
         {
-            var target = hit.collider.GetComponent<IDamageable>();
+            var target = hit.collider.GetComponent<LivingEntity>();
             if (target != null) // 충돌한 대상이 IDamageable 인터페이스를 구현하고 있다면 데미지를 적용
             {
-                target.OnDamage(gunData.damage, hit.point, hit.normal);
+                if (!target.IsDead)
+                {
+                    target.OnDamage(gunData.damage, hit.point, hit.normal);
+                }
+
             }
 
             hitPosition = hit.point; // Raycast가 충돌한 지점으로 설정 (world 좌표)
@@ -107,10 +114,13 @@ public class Gun : MonoBehaviour
         coShot = StartCoroutine(CoShotEffect(hitPosition)); // 호출될 때마다 Coroutine 클래스가 매번 생성됨
 
         magAmmo--;
+        uiManager.SetAmmoText(magAmmo, ammoRemain);
+
         if (magAmmo <= 0)
         {
             State = Stats.Empty;
         }
+
     }
 
     // --- 총알 궤적 효과와 사운드 효과를 처리하는 Coroutine인 CoShotEffect() 메서드 ---
@@ -169,6 +179,14 @@ public class Gun : MonoBehaviour
         magAmmo += ammoToFill; // 탄창에 총알을 채움
         ammoRemain -= ammoToFill; // 남은 총알 수에서 채운 총알 수만큼 감소
 
+        uiManager.SetAmmoText(magAmmo, ammoRemain);
+
         State = Stats.Ready;
+    }
+
+    public void AddAmmo(int ammo)
+    {
+        ammoRemain += ammo;
+        uiManager.SetAmmoText(magAmmo, ammoRemain);
     }
 }

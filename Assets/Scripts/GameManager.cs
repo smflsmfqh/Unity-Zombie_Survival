@@ -2,36 +2,30 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    public static GameManager instance
-    {
-        get
-        {
-            if (m_instance == null)
-            {
-                m_instance = FindObjectOfType<GameManager>();
+    public UIManager uiManager;
+    public ZombieSpawner Spawner;   
 
-            }
-            return m_instance;
-        }
-    }
-    private static GameManager m_instance;
     private int score = 0;
-    public bool isGameOver { get; private set; } = false;
+    public bool IsGameOver { get; private set; }
 
-    private void Awake()
+    public void Start()
     {
-        if (instance != this)
+        uiManager.SetScoreText(score);
+    }
+    public void AddScore(int add)
+    {
+        if (IsGameOver)
         {
-            Destroy(gameObject);
+            return;
         }
-    }
-    void Start()
-    {
-        
+        score += add;
+        uiManager.SetScoreText(score);
     }
 
-    void Update()
+    public void EndGame()
     {
-        
+        IsGameOver = true;
+        Spawner.enabled = false;    
+        uiManager.SetActiveGameOverUi(true);
     }
 }

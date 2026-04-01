@@ -56,4 +56,5 @@ public class PlayerShooter : MonoBehaviour
         playerAnimator.SetIKPosition(AvatarIKGoal.RightHand, rightHandMount.position);
         playerAnimator.SetIKRotation(AvatarIKGoal.RightHand, rightHandMount.rotation);
     }
+
 }

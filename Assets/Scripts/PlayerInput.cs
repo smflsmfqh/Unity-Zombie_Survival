@@ -13,16 +13,16 @@ public class PlayerInput : MonoBehaviour
     public bool fire { get; private set; }
     public bool reload { get; private set; }
 
+    void Awake()
+    {
+        move = 0f;
+        rotate = 0f;
+        fire = false;
+        reload = false;
+        
+    }
     void Update()
     {
-        if (GameManager.instance != null && GameManager.instance.isGameOver)
-        {
-            move = 0f;
-            rotate = 0f;
-            fire = false;
-            reload = false;
-            return;
-        }
 
         move = Input.GetAxis(moveAxisName);
         rotate = Input.GetAxis(rotateAxisName);
